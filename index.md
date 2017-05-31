@@ -1,37 +1,75 @@
-## Welcome to GitHub Pages
+#SERVER
 
-You can use the [editor on GitHub](https://github.com/coderbaba1/slidingwindow/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+import java.io.*;
+import java.net.*;
+public class SWreciever19 {
+ public static void main(String args[]) throws IOException {
+  int RWS = 8, LAF = 0, LAR = 0;
+  InetAddress obj = InetAddress.getLocalHost();
+  Socket s = new Socket(obj, 589);
+  BufferedReader dis = new BufferedReader(new InputStreamReader(System.in));
+  PrintStream p = new PrintStream(s.getOutputStream());
+  while (true) {
+   int i = 0;
+   while (i < RWS) {
+    String t;
+    if (LAF - LAR <= RWS) {
+     t = dis.readLine();
+     if (t.equals("QUIT")) System.exit(0);
+     System.out.println("received" + t + "Successfully");
+     LAR++;
+     p.println("Acknowledgement for" + t);
+     LAF++;
+    }
+    i++;
+   }
+   System.out.println();
+  }
+ }
+}
 
-### Markdown
+##CLIENT
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/coderbaba1/slidingwindow/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+import java.io.*;
+import java.net.*;
+public class SWsender19 {
+ public static void main(String args[]) throws IOException {
+  int SWS = 8;
+  int LAR = 0;
+  int LFS = 0;
+  ServerSocket ss = new ServerSocket(5277);
+  Socket s = ss.accept();
+  System.out.println("Type your message >>>>");
+  BufferedReader dis = new BufferedReader(new InputStreamReader(s.getInputStream()));
+  PrintStream p = new PrintStream(s.getOutputStream());
+  while (true) {
+   int i = 0, j = 0;
+   BufferedReader br1 = new BufferedReader(new InputStreamReader(System.in));
+   String t = br1.readLine();
+   if (t.trim().toLowerCase().equals("quit")) {
+    p.println(t);
+    System.exit(0);
+   }
+   char c[] = new char[100];
+   c = t.toCharArray();
+   int sent = 1;
+   while (i < t.length()) {
+    while (i < t.length() && i < SWS * sent) {
+     if (LFS - LAR <= SWS) {
+      p.println(c[i]);
+      LFS++;
+      System.out.println("sent=" + c[i++] + "Successfully");
+     }
+    }
+    while (j < t.length() && j < SWS * sent) {
+     String t1 = dis.readLine();
+     System.out.println(t1);
+     j++;
+     LAR++;
+    }
+    sent++;
+    System.out.println();
+   }
+  }
+ }
